@@ -1,4 +1,3 @@
-// client/src/state/aiState.ts
 import React, { createContext, useContext, useState } from 'react';
 import { AICommandResult, Operation, SelectionRange } from '../shared/types';
 import { apiClient } from '../services/apiClient';
@@ -22,14 +21,18 @@ const API_KEY_STORAGE_KEY = 'ai-excel-api-key';
 
 export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AIState>({
-    apiKey: localStorage.getItem(API_KEY_STORAGE_KEY),
+    apiKey: typeof window !== 'undefined'
+      ? localStorage.getItem(API_KEY_STORAGE_KEY)
+      : null,
     prompt: '',
     lastResult: null,
     isRunning: false
   });
 
   function setApiKey(key: string) {
-    localStorage.setItem(API_KEY_STORAGE_KEY, key);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(API_KEY_STORAGE_KEY, key);
+    }
     setState(prev => ({ ...prev, apiKey: key }));
   }
 

@@ -1,4 +1,3 @@
-// client/src/state/undoRedoState.ts
 import React, { createContext, useContext, useState } from 'react';
 import { Operation } from '../shared/types';
 

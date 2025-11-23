@@ -1,4 +1,3 @@
-// client/src/state/sheetState.ts
 import React, { createContext, useContext, useState } from 'react';
 import { CellId, Operation, Sheet } from '../shared/types';
 import { apiClient } from '../services/apiClient';
@@ -33,7 +32,12 @@ export const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     if (current?.raw === raw) return sheet;
 
-    const updated = await apiClient.updateCell(sheetId, grid.activeCell.row, grid.activeCell.col, raw);
+    const updated = await apiClient.updateCell(
+      sheetId,
+      grid.activeCell.row,
+      grid.activeCell.col,
+      raw
+    );
     setSheet(updated);
     return updated;
   }
@@ -67,18 +71,13 @@ export function useSheet() {
   return ctx;
 }
 
-// helper utilities
-
 export function a1FromCellId(id: CellId): string {
-  const letters = (() => {
-    let col = id.col + 1;
-    let s = '';
-    while (col > 0) {
-      const rem = (col - 1) % 26;
-      s = String.fromCharCode(65 + rem) + s;
-      col = Math.floor((col - 1) / 26);
-    }
-    return s;
-  })();
+  let col = id.col + 1;
+  let letters = '';
+  while (col > 0) {
+    const rem = (col - 1) % 26;
+    letters = String.fromCharCode(65 + rem) + letters;
+    col = Math.floor((col - 1) / 26);
+  }
   return `${letters}${id.row + 1}`;
 }
