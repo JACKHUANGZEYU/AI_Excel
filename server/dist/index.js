@@ -9,11 +9,13 @@ const cors_1 = __importDefault(require("cors"));
 const sheets_1 = __importDefault(require("./routes/sheets"));
 const ai_1 = __importDefault(require("./routes/ai"));
 const formulas_1 = __importDefault(require("./routes/formulas"));
+const aiOperation_1 = __importDefault(require("./routes/aiOperation"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({ origin: 'http://localhost:5173' }));
 app.use(express_1.default.json());
 app.use('/api/sheets', sheets_1.default);
 app.use('/api/ai', ai_1.default);
+app.use('/api/ai-operation', aiOperation_1.default);
 app.use('/api/formulas', formulas_1.default);
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

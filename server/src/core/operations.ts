@@ -42,7 +42,8 @@ export function applyOperations(sheet: Sheet, ops: Operation[]): Sheet {
 
 // convenience: create demo sheet used on first load
 export function createDemoSheet(id = 'sheet1'): Sheet {
-  const sheet = createEmptySheet(id, 'Sheet1', 50, 20);
+  // expand to 1000x1000 for virtualization testing
+  const sheet = createEmptySheet(id, 'Sheet1', 1000, 1000);
   // add a couple of example values
   const c1 = getCell(sheet, { row: 0, col: 0 });
   c1.raw = '1';

@@ -4,6 +4,7 @@ import cors from 'cors';
 import sheetsRouter from './routes/sheets';
 import aiRouter from './routes/ai';
 import formulasRouter from './routes/formulas';
+import aiOperationRouter from './routes/aiOperation';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use('/api/sheets', sheetsRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/ai-operation', aiOperationRouter);
 app.use('/api/formulas', formulasRouter);
 
 const PORT = process.env.PORT || 4000;

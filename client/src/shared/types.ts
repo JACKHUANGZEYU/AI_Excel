@@ -90,3 +90,15 @@ export interface AICommandResult {
   operations: Operation[];
   message?: string;
 }
+
+export interface AIOperationRequest {
+  apiKey: string;
+  prompt: string;
+  data: (string | number | boolean | null)[][];
+  model?: string;
+}
+
+export interface AIOperationResponse {
+  data: (string | number | boolean | null)[][];
+  message?: string;
+}

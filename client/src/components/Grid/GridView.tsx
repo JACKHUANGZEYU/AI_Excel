@@ -195,6 +195,39 @@ export const GridView: React.FC<Props> = ({ sheetId, grid, setGrid }) => {
     }
   }, []);
 
+  // ---- clipboard paste (TSV) ----
+  const parseClipboard = (text: string): string[][] => {
+    const rows = text
+      .split(/\r\n|\n|\r/)
+      .filter((r, idx, arr) => !(r.trim() === '' && idx === arr.length - 1));
+    return rows.map(r => r.split('\t').map(cell => cell.replace(/^"(.*)"$/, '$1')));
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
+    if (!sheet) return;
+    const anchor = grid.activeCell || grid.selectionRange?.start;
+    if (!anchor) return;
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    if (!text) return;
+    const matrix = parseClipboard(text);
+    const ops: Operation[] = [];
+    for (let i = 0; i < matrix.length; i++) {
+      for (let j = 0; j < matrix[i].length; j++) {
+        const r = anchor.row + i;
+        const c = anchor.col + j;
+        if (r >= sheet.rowCount || c >= sheet.colCount) continue;
+        const rawVal = matrix[i][j];
+        const raw = rawVal === undefined ? '' : rawVal;
+        ops.push({ type: 'setCell', sheetId, row: r, col: c, raw });
+      }
+    }
+    if (ops.length) {
+      push(ops);
+      await applyOperations(sheetId, ops);
+    }
+  };
+
   useLayoutEffect(() => {
     if (!tableRef.current) return;
     const td = tableRef.current.querySelector('td.cell') as HTMLTableCellElement | null;
@@ -354,6 +387,7 @@ export const GridView: React.FC<Props> = ({ sheetId, grid, setGrid }) => {
           top: (e.target as HTMLDivElement).scrollTop
         })
       }
+      onPaste={handlePaste}
     >
       <table className="grid" ref={tableRef}>
         <thead>

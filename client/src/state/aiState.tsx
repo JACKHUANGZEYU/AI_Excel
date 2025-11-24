@@ -1,18 +1,18 @@
 import React, { createContext, useContext, useState } from 'react';
-import { AICommandResult, Operation, SelectionRange } from '../shared/types';
+import { AIOperationResponse } from '../shared/types';
 import { apiClient } from '../services/apiClient';
 
 interface AIState {
   apiKey: string | null;
   prompt: string;
-  lastResult: AICommandResult | null;
+  lastResult: AIOperationResponse | null;
   isRunning: boolean;
 }
 
 interface AIContextValue extends AIState {
   setApiKey: (key: string) => void;
   setPrompt: (prompt: string) => void;
-  runCommand: (sheetId: string, selection: SelectionRange) => Promise<Operation[]>;
+  runCommand: (data: (string | number | boolean | null)[][]) => Promise<AIOperationResponse | null>;
 }
 
 const AIContext = createContext<AIContextValue | undefined>(undefined);
@@ -41,20 +41,22 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   async function runCommand(
-    sheetId: string,
-    selection: SelectionRange
-  ): Promise<Operation[]> {
-    if (!state.prompt.trim()) return [];
+    data: (string | number | boolean | null)[][]
+  ): Promise<AIOperationResponse | null> {
+    if (!state.prompt.trim()) return null;
+    if (!state.apiKey) return null;
     setState(prev => ({ ...prev, isRunning: true }));
     try {
-      const result = await apiClient.runAICommand(
-        sheetId,
-        state.prompt,
-        selection,
-        state.apiKey
-      );
+      const result = await apiClient.runAIOperation({
+        apiKey: state.apiKey,
+        prompt: state.prompt,
+        data
+      });
       setState(prev => ({ ...prev, lastResult: result }));
-      return result.operations;
+      return result;
+    } catch (err) {
+      console.error('AI operation failed', err);
+      throw err;
     } finally {
       setState(prev => ({ ...prev, isRunning: false }));
     }

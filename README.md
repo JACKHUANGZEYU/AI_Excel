@@ -101,5 +101,6 @@ Dev URLs:
 
 ## Notes / Next steps
 - AI endpoint is stubbed; wire to your provider inside `server/src/routes/ai.ts` using forwarded `apiKey`.
+- Gemini model override: `/api/ai-operation` defaults to `gemini-1.5-flash` (v1beta). Override via `process.env.GEMINI_MODEL` or pass `model` in the request body (e.g., `gemini-2.5-flash`); Gemini 2.x models use the v1 endpoint automatically.
 - Structural operations (insert/delete rows/cols, reorder) are placeholders in `gridState.ts` / `operations.ts`.
 - Selection/scroll handling uses measured cell/header sizes; if styling changes, verify handle/overlay alignment.

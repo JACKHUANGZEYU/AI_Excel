@@ -66,7 +66,7 @@ export const AIPanel: React.FC<Props> = ({ sheetId, selection, onRun }) => {
 
       <div className="ai-section">
         <button disabled={!selection || isRunning} onClick={onRun}>
-          {isRunning ? 'Running…' : 'Run AI Command'}
+          {isRunning ? 'Processing…' : 'Run AI Command'}
         </button>
       </div>
 
@@ -74,7 +74,10 @@ export const AIPanel: React.FC<Props> = ({ sheetId, selection, onRun }) => {
         <div className="ai-section ai-result">
           <strong>Last result</strong>
           {lastResult.message && <p>{lastResult.message}</p>}
-          <p>Operations: {lastResult.operations.length}</p>
+          <p>
+            Shape: {lastResult.data.length} ×{' '}
+            {lastResult.data[0] ? lastResult.data[0].length : 0}
+          </p>
         </div>
       )}
     </div>

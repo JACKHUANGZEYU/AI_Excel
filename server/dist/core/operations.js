@@ -44,7 +44,8 @@ function applyOperations(sheet, ops) {
 }
 // convenience: create demo sheet used on first load
 function createDemoSheet(id = 'sheet1') {
-    const sheet = (0, SheetModel_1.createEmptySheet)(id, 'Sheet1', 50, 20);
+    // expand to 1000x1000 for virtualization testing
+    const sheet = (0, SheetModel_1.createEmptySheet)(id, 'Sheet1', 1000, 1000);
     // add a couple of example values
     const c1 = (0, SheetModel_1.getCell)(sheet, { row: 0, col: 0 });
     c1.raw = '1';

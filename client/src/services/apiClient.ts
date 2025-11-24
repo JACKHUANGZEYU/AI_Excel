@@ -1,5 +1,7 @@
 import {
   AICommandResult,
+  AIOperationRequest,
+  AIOperationResponse,
   Operation,
   SelectionRange,
   Sheet
@@ -25,6 +27,8 @@ export interface ApiClient {
     selection: SelectionRange,
     apiKey?: string | null
   ): Promise<AICommandResult>;
+
+  runAIOperation(body: AIOperationRequest): Promise<AIOperationResponse>;
 }
 
 export const apiClient: ApiClient = {
@@ -64,6 +68,19 @@ export const apiClient: ApiClient = {
       body: JSON.stringify({ sheetId, prompt, selection, apiKey })
     });
     if (!res.ok) throw new Error('AI command failed');
+    return res.json();
+  },
+
+  async runAIOperation(body) {
+    const res = await fetch(`${BASE_URL}/api/ai-operation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'AI operation failed');
+    }
     return res.json();
   }
 };
