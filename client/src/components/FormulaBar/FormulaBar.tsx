@@ -18,6 +18,12 @@ interface Props {
 export const FormulaBar: React.FC<Props> = ({ sheetId, grid, setGrid, inputRef }) => {
   const { sheet, commitEditBuffer } = useSheet();
 
+  const commitFromBar = async () => {
+    const nextGrid = handleFormulaBarCommit(grid);
+    setGrid(nextGrid);
+    await commitEditBuffer(sheetId, nextGrid);
+  };
+
   useEffect(() => {
     // sync editBuffer with active cell raw when selection changes and not editing
     if (!sheet || !grid.activeCell || grid.isEditing) return;
@@ -30,8 +36,26 @@ export const FormulaBar: React.FC<Props> = ({ sheetId, grid, setGrid, inputRef }
       }));
   }, [sheetId, sheet, grid.activeCell?.row, grid.activeCell?.col, grid.isEditing, setGrid]);
 
+  useEffect(() => {
+    if (grid.editSource === 'formula' && inputRef?.current) {
+      const el = inputRef.current;
+      const len = el.value.length;
+      el.setSelectionRange(len, len);
+      el.focus();
+    }
+  }, [grid.editSource, inputRef]);
+
   const onFocus = () => {
-    setGrid(prev => handleFormulaBarFocus(prev));
+    const key = grid.activeCell
+      ? `R${grid.activeCell.row}C${grid.activeCell.col}`
+      : null;
+    setGrid(prev => {
+      const raw = key && sheet ? sheet.cells[key]?.raw ?? '' : prev.editBuffer;
+      return {
+        ...handleFormulaBarFocus(prev),
+        editBuffer: raw
+      };
+    });
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,9 +66,7 @@ export const FormulaBar: React.FC<Props> = ({ sheetId, grid, setGrid, inputRef }
   const onKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const nextGrid = handleFormulaBarCommit(grid);
-      setGrid(nextGrid);
-      await commitEditBuffer(sheetId, nextGrid);
+      await commitFromBar();
     }
   };
 
@@ -57,6 +79,7 @@ export const FormulaBar: React.FC<Props> = ({ sheetId, grid, setGrid, inputRef }
         onFocus={onFocus}
         onChange={onChange}
         onKeyDown={onKeyDown}
+        onBlur={commitFromBar}
         ref={inputRef}
       />
     </div>

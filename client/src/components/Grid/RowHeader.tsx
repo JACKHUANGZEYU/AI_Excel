@@ -1,6 +1,7 @@
 // client/src/components/Grid/RowHeader.tsx
 import React from 'react';
 import { GridState, handleRowHeaderClick } from '../../state/gridState';
+import { isRowInRange } from '../../utils/rangeUtils';
 
 interface Props {
   rowIndex: number;
@@ -11,10 +12,8 @@ interface Props {
 
 export const RowHeader: React.FC<Props> = ({ rowIndex, grid, setGrid, colCount }) => {
   const isSelected =
-    grid.selectionMode === 'row' &&
-    grid.selectionRange &&
-    rowIndex >= grid.selectionRange.start.row &&
-    rowIndex <= grid.selectionRange.end.row;
+    (grid.selectionMode === 'row' || grid.selectionMode === 'column' || grid.selectionMode === 'range' || grid.selectionMode === 'cell') &&
+    isRowInRange(rowIndex, grid.selectionRange);
 
   const className = ['row-header', isSelected ? 'row-header--selected' : '']
     .filter(Boolean)

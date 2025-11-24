@@ -1,7 +1,7 @@
 // client/src/components/Grid/ColumnHeader.tsx
 import React from 'react';
 import { GridState, handleColumnHeaderClick } from '../../state/gridState';
-import { isCellInRange } from '../../utils/rangeUtils';
+import { isColInRange } from '../../utils/rangeUtils';
 
 interface Props {
   colIndex: number;
@@ -28,9 +28,8 @@ export const ColumnHeader: React.FC<Props> = ({
   rowCount
 }) => {
   const isSelected =
-    grid.selectionMode === 'column' &&
-    grid.selectionRange &&
-    isCellInRange({ row: grid.selectionRange.start.row, col: colIndex }, grid.selectionRange);
+    (grid.selectionMode === 'column' || grid.selectionMode === 'row' || grid.selectionMode === 'range' || grid.selectionMode === 'cell') &&
+    isColInRange(colIndex, grid.selectionRange);
 
   const className = ['col-header', isSelected ? 'col-header--selected' : '']
     .filter(Boolean)

@@ -6,6 +6,7 @@ export interface GridState {
   selectionRange: SelectionRange | null;
   selectionMode: SelectionMode;
   isEditing: boolean;
+  editSource: 'cell' | 'formula' | null;
   editBuffer: string;
   dragType: 'selection' | 'fill' | 'row-reorder' | 'col-reorder' | null;
   dragAnchor: CellId | null;
@@ -21,6 +22,7 @@ export const initialGridState: GridState = {
   selectionRange: null,
   selectionMode: 'cell',
   isEditing: false,
+  editSource: null,
   editBuffer: '',
   dragType: null,
   dragAnchor: null,
@@ -46,7 +48,9 @@ export function handleCellSingleClick(
     activeCell: cellId,
     selectionRange: rangeFromCell(cellId),
     selectionMode: 'cell',
-    isEditing: false
+    isEditing: false,
+    editSource: null,
+    editBuffer: ''
   };
 }
 
@@ -60,6 +64,7 @@ export function handleCellDoubleClick(
     selectionRange: rangeFromCell(cellId),
     selectionMode: 'cell',
     isEditing: true,
+    editSource: 'cell',
     editBuffer: state.editBuffer
   };
 }
@@ -71,7 +76,9 @@ export function handleCellMouseDown(state: GridState, cellId: CellId): GridState
     dragAnchor: cellId,
     dragCurrent: cellId,
     selectionRange: rangeFromCell(cellId),
-    activeCell: cellId
+    activeCell: cellId,
+    isEditing: false,
+    editSource: null
   };
 }
 
@@ -245,6 +252,7 @@ export function handleEditCancel(state: GridState): GridState {
   return {
     ...state,
     isEditing: false,
+    editSource: null,
     editBuffer: ''
   };
 }
@@ -256,7 +264,8 @@ export function handleEditCommit(
 ): GridState {
   let nextState: GridState = {
     ...state,
-    isEditing: false
+    isEditing: false,
+    editSource: null
   };
 
   if (direction) {
@@ -270,7 +279,8 @@ export function handleEditCommit(
 export function handleFormulaBarFocus(state: GridState): GridState {
   return {
     ...state,
-    isEditing: true
+    isEditing: true,
+    editSource: 'formula'
   };
 }
 

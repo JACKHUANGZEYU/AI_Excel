@@ -63,11 +63,7 @@ const AppInner: React.FC = () => {
     <div className="app">
       <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
       <FormulaBar sheetId={SHEET_ID} grid={grid} setGrid={setGrid} inputRef={formulaInputRef} />
-      <GridView
-        grid={grid}
-        setGrid={setGrid}
-        onStartEditing={() => formulaInputRef.current?.focus()}
-      />
+      <GridView sheetId={SHEET_ID} grid={grid} setGrid={setGrid} />
       <AIPanel sheetId={SHEET_ID} selection={selection} onRun={handleRunAI} />
     </div>
   );
