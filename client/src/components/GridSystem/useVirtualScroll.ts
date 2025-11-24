@@ -75,12 +75,16 @@ export function useVirtualScroll({
     const baseRowSpan = Math.max(1, endRow - startRow);
     const baseColSpan = Math.max(1, endCol - startCol);
 
-    const allowedCells = Math.max(maxRenderCells, baseRowSpan * baseColSpan);
-    const allowedRows = Math.max(baseRowSpan, Math.floor(allowedCells / Math.max(baseColSpan, 1)));
-    const allowedCols = Math.max(baseColSpan, Math.floor(allowedCells / Math.max(allowedRows, 1)));
+    const baseCells = baseRowSpan * baseColSpan;
+    const maxCells = Math.max(maxRenderCells, baseCells);
+    const extraCapacity = Math.max(0, maxCells - baseCells);
 
-    const rowOverscan = Math.min(overscan, Math.floor((allowedRows - baseRowSpan) / 2));
-    const colOverscan = Math.min(overscan, Math.floor((allowedCols - baseColSpan) / 2));
+    const rowOverscanBudget = Math.floor(extraCapacity / Math.max(baseColSpan * 2, 1));
+    const rowOverscan = Math.min(overscan, rowOverscanBudget);
+
+    const remainingAfterRows = Math.max(0, extraCapacity - rowOverscan * 2 * baseColSpan);
+    const colOverscanBudget = Math.floor(remainingAfterRows / Math.max(baseRowSpan * 2, 1));
+    const colOverscan = Math.min(overscan, colOverscanBudget);
 
     const renderStartRow = Math.max(0, startRow - rowOverscan);
     const renderEndRow = Math.min(rowCount, endRow + rowOverscan);

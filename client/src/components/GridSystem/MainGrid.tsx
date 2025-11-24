@@ -21,6 +21,7 @@ interface Props {
   headerSizes: { height: number; width: number };
   sheet: any;
   applyOps: (ops: any[]) => Promise<void>;
+  commitEditBuffer: (sheetId: string, grid: GridState) => Promise<any>;
   pushOps: (ops: any[]) => void;
   containerRef: React.RefObject<HTMLDivElement>;
 }
@@ -41,6 +42,7 @@ export const MainGrid: React.FC<Props> = ({
   headerSizes,
   sheet,
   applyOps,
+  commitEditBuffer,
   pushOps,
   containerRef
 }) => {
@@ -80,6 +82,7 @@ export const MainGrid: React.FC<Props> = ({
   const commitEdit = async () => {
     const nextGrid = handleEditCommit(grid);
     setGrid(nextGrid);
+    await commitEditBuffer(sheetId, nextGrid);
   };
 
   const cancelEdit = () => {
