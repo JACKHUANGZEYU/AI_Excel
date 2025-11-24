@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const GridContainer: React.FC<Props> = ({ sheetId, grid, setGrid }) => {
-  const { sheet, applyOperations } = useSheet();
+  const { sheet, applyOperations, commitEditBuffer } = useSheet();
   const { push } = useUndoRedo();
   const mainRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -123,6 +123,7 @@ export const GridContainer: React.FC<Props> = ({ sheetId, grid, setGrid }) => {
           headerSizes={{ height: HEADER_HEIGHT, width: HEADER_WIDTH }}
           sheet={sheet}
           applyOps={applyOps}
+          commitEditBuffer={commitEditBuffer}
           pushOps={push}
           containerRef={mainRef}
         />
