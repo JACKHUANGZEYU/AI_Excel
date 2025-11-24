@@ -109,20 +109,9 @@ export const MainGrid: React.FC<Props> = ({
         height: (normalizedSel.end.row - normalizedSel.start.row + 1) * rowHeight
       }
     : null;
-
-  const maxCells = 2000;
-  const visibleRows = ranges.rows.end - ranges.rows.start;
-  const visibleCols = ranges.cols.end - ranges.cols.start;
-  const maxRows = Math.max(1, Math.floor(maxCells / Math.max(1, visibleCols)));
-  const limitedRowEnd = Math.min(ranges.rows.end, ranges.rows.start + maxRows);
-  const limitedColEnd = Math.min(
-    ranges.cols.end,
-    ranges.cols.start + Math.max(1, Math.floor(maxCells / Math.max(1, visibleRows)))
-  );
-
   const cells: JSX.Element[] = [];
-  for (let r = ranges.rows.start; r < limitedRowEnd; r++) {
-    for (let c = ranges.cols.start; c < limitedColEnd; c++) {
+  for (let r = ranges.rows.start; r < ranges.rows.end; r++) {
+    for (let c = ranges.cols.start; c < ranges.cols.end; c++) {
       const id: CellId = { row: r, col: c };
       const isActive = grid.activeCell && grid.activeCell.row === r && grid.activeCell.col === c;
       const isSelected = isCellInRange(id, normalizedSel);
