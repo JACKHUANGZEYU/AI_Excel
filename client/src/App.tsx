@@ -1,5 +1,5 @@
 // client/src/App.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SheetProvider, useSheet } from './state/sheetState';
 import { AIProvider, useAI } from './state/aiState';
 import { UndoRedoProvider, useUndoRedo } from './state/undoRedoState';
@@ -17,10 +17,20 @@ const AppInner: React.FC = () => {
   const { runCommand } = useAI();
   const { push, undo, redo } = useUndoRedo();
   const [grid, setGrid] = useState<GridState>(initialGridState);
+  const formulaInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     refreshSheet(SHEET_ID).catch(console.error);
   }, [refreshSheet]);
+
+  useEffect(() => {
+    if (!sheet) return;
+    setGrid(prev => ({
+      ...prev,
+      viewportRowCount: sheet.rowCount,
+      viewportColCount: sheet.colCount
+    }));
+  }, [sheet?.rowCount, sheet?.colCount]);
 
   const selection: SelectionRange | null = grid.selectionRange;
 
@@ -52,8 +62,12 @@ const AppInner: React.FC = () => {
   return (
     <div className="app">
       <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
-      <FormulaBar sheetId={SHEET_ID} grid={grid} setGrid={setGrid} />
-      <GridView />
+      <FormulaBar sheetId={SHEET_ID} grid={grid} setGrid={setGrid} inputRef={formulaInputRef} />
+      <GridView
+        grid={grid}
+        setGrid={setGrid}
+        onStartEditing={() => formulaInputRef.current?.focus()}
+      />
       <AIPanel sheetId={SHEET_ID} selection={selection} onRun={handleRunAI} />
     </div>
   );

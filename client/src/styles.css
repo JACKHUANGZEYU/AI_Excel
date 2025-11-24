@@ -43,6 +43,11 @@ body {
   font-weight: 600;
 }
 
+.row-header--selected,
+.col-header--selected {
+  background: #e3f2ff;
+}
+
 .cell--active {
   outline: 2px solid #4a90e2;
   outline-offset: -2px;

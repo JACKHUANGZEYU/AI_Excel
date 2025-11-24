@@ -91,6 +91,7 @@ export interface AICommandRequest {
   sheetId: string;
   prompt: string;
   selection: SelectionRange;
+  apiKey?: string | null;
 }
 
 export interface AICommandResult {

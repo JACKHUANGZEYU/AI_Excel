@@ -1,23 +1,27 @@
 // client/src/components/Grid/GridView.tsx
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { CellId } from '../../shared/types';
 import { useSheet } from '../../state/sheetState';
 import {
-  GridState,
-  initialGridState,
   handleCellDoubleClick,
   handleCellMouseDown,
   handleCellMouseMove,
   handleCellMouseUp,
-  handleCellSingleClick
+  handleCellSingleClick,
+  GridState
 } from '../../state/gridState';
 import { CellView } from './CellView';
 import { RowHeader } from './RowHeader';
 import { ColumnHeader } from './ColumnHeader';
 
-export const GridView: React.FC = () => {
+interface Props {
+  grid: GridState;
+  setGrid: React.Dispatch<React.SetStateAction<GridState>>;
+  onStartEditing?: () => void;
+}
+
+export const GridView: React.FC<Props> = ({ grid, setGrid, onStartEditing }) => {
   const { sheet } = useSheet();
-  const [grid, setGrid] = useState<GridState>(initialGridState);
 
   const rowCount = sheet?.rowCount ?? 0;
   const colCount = sheet?.colCount ?? 0;
@@ -32,12 +36,27 @@ export const GridView: React.FC = () => {
     [sheet]
   );
 
+  const getCellRaw = useCallback(
+    (id: CellId) => {
+      if (!sheet) return '';
+      const key = `R${id.row}C${id.col}`;
+      const cell = sheet.cells[key];
+      return cell?.raw ?? '';
+    },
+    [sheet]
+  );
+
   const handleClick = (id: CellId) => {
     setGrid(prev => handleCellSingleClick(prev, id));
   };
 
   const handleDblClick = (id: CellId) => {
-    setGrid(prev => handleCellDoubleClick(prev, id));
+    const raw = getCellRaw(id);
+    setGrid(prev => {
+      const next = handleCellDoubleClick(prev, id);
+      return { ...next, editBuffer: raw ?? '' };
+    });
+    onStartEditing?.();
   };
 
   const handleDown = (id: CellId) => {
@@ -79,7 +98,7 @@ export const GridView: React.FC = () => {
 
     rows.push(
       <tr key={r}>
-        <RowHeader rowIndex={r} />
+        <RowHeader rowIndex={r} grid={grid} setGrid={setGrid} colCount={colCount} />
         {cells}
       </tr>
     );
@@ -87,7 +106,15 @@ export const GridView: React.FC = () => {
 
   const headerCells: JSX.Element[] = [<th key="blank" />];
   for (let c = 0; c < colCount; c++) {
-    headerCells.push(<ColumnHeader key={c} colIndex={c} />);
+    headerCells.push(
+      <ColumnHeader
+        key={c}
+        colIndex={c}
+        grid={grid}
+        setGrid={setGrid}
+        rowCount={rowCount}
+      />
+    );
   }
 
   return (

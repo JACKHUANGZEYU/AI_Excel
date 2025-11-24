@@ -302,15 +302,18 @@ export function insertCellReferenceFromFormula(
 
 export function handleRowHeaderClick(
   state: GridState,
-  rowIndex: number
+  rowIndex: number,
+  colCount: number
 ): GridState {
   return {
     ...state,
     selectionMode: 'row',
     selectionRange: {
       start: { row: rowIndex, col: 0 },
-      end: { row: rowIndex, col: state.viewportColCount - 1 }
-    }
+      end: { row: rowIndex, col: Math.max(0, colCount - 1) }
+    },
+    activeCell: { row: rowIndex, col: 0 },
+    isEditing: false
   };
 }
 
@@ -333,15 +336,18 @@ export function handleClearSelectedRows(state: GridState): GridState {
 // Column operations stubs
 export function handleColumnHeaderClick(
   state: GridState,
-  colIndex: number
+  colIndex: number,
+  rowCount: number
 ): GridState {
   return {
     ...state,
     selectionMode: 'column',
     selectionRange: {
       start: { row: 0, col: colIndex },
-      end: { row: state.viewportRowCount - 1, col: colIndex }
-    }
+      end: { row: Math.max(0, rowCount - 1), col: colIndex }
+    },
+    activeCell: { row: 0, col: colIndex },
+    isEditing: false
   };
 }
 

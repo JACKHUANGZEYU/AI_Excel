@@ -5,7 +5,7 @@ import {
   Sheet
 } from '../shared/types';
 
-const BASE_URL = 'http://localhost:4000';
+const BASE_URL = '';
 
 export interface ApiClient {
   getSheet(sheetId: string): Promise<Sheet>;
@@ -22,7 +22,8 @@ export interface ApiClient {
   runAICommand(
     sheetId: string,
     prompt: string,
-    selection: SelectionRange
+    selection: SelectionRange,
+    apiKey?: string | null
   ): Promise<AICommandResult>;
 }
 
@@ -56,11 +57,11 @@ export const apiClient: ApiClient = {
     return res.json();
   },
 
-  async runAICommand(sheetId, prompt, selection) {
+  async runAICommand(sheetId, prompt, selection, apiKey) {
     const res = await fetch(`${BASE_URL}/api/ai/command`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sheetId, prompt, selection })
+      body: JSON.stringify({ sheetId, prompt, selection, apiKey })
     });
     if (!res.ok) throw new Error('AI command failed');
     return res.json();

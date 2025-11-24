@@ -1,6 +1,6 @@
 // server/src/routes/ai.ts
 import { Router } from 'express';
-import { AICommandRequest, AICommandResult } from '../shared/types';
+import { AICommandRequest, AICommandResult, Operation } from '../shared/types';
 
 const router = Router();
 
@@ -8,11 +8,27 @@ const router = Router();
 router.post('/command', (req, res) => {
   const body = req.body as AICommandRequest;
 
-  // TODO: call real AI provider with prompt + snapshot.
-  // For now, return empty operations and a debug message.
+  const operations: Operation[] = [];
+  const prompt = (body.prompt || '').trim();
+
+  if (prompt && body.selection) {
+    const targetRow = Math.min(body.selection.start.row, body.selection.end.row);
+    const targetCol = Math.min(body.selection.start.col, body.selection.end.col);
+
+    operations.push({
+      type: 'setCell',
+      sheetId: body.sheetId,
+      row: targetRow,
+      col: targetCol,
+      raw: prompt
+    });
+  }
+
   const result: AICommandResult = {
-    operations: [],
-    message: `AI stub received prompt: "${body.prompt}" for sheet ${body.sheetId}`
+    operations,
+    message: prompt
+      ? `AI stub stored your prompt in the top-left cell of the selection${body.apiKey ? ' using the provided API key' : ''}.`
+      : 'AI stub received an empty prompt.'
   };
 
   res.json(result);

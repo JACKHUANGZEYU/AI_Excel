@@ -1,8 +1,13 @@
 // client/src/components/Grid/ColumnHeader.tsx
 import React from 'react';
+import { GridState, handleColumnHeaderClick } from '../../state/gridState';
+import { isCellInRange } from '../../utils/rangeUtils';
 
 interface Props {
   colIndex: number;
+  grid: GridState;
+  setGrid: React.Dispatch<React.SetStateAction<GridState>>;
+  rowCount: number;
 }
 
 function colIndexToLetters(index: number): string {
@@ -16,6 +21,27 @@ function colIndexToLetters(index: number): string {
   return s;
 }
 
-export const ColumnHeader: React.FC<Props> = ({ colIndex }) => {
-  return <th className="col-header">{colIndexToLetters(colIndex)}</th>;
+export const ColumnHeader: React.FC<Props> = ({
+  colIndex,
+  grid,
+  setGrid,
+  rowCount
+}) => {
+  const isSelected =
+    grid.selectionMode === 'column' &&
+    grid.selectionRange &&
+    isCellInRange({ row: grid.selectionRange.start.row, col: colIndex }, grid.selectionRange);
+
+  const className = ['col-header', isSelected ? 'col-header--selected' : '']
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <th
+      className={className}
+      onClick={() => setGrid(prev => handleColumnHeaderClick(prev, colIndex, rowCount))}
+    >
+      {colIndexToLetters(colIndex)}
+    </th>
+  );
 };

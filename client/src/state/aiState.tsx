@@ -47,7 +47,12 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (!state.prompt.trim()) return [];
     setState(prev => ({ ...prev, isRunning: true }));
     try {
-      const result = await apiClient.runAICommand(sheetId, state.prompt, selection);
+      const result = await apiClient.runAICommand(
+        sheetId,
+        state.prompt,
+        selection,
+        state.apiKey
+      );
       setState(prev => ({ ...prev, lastResult: result }));
       return result.operations;
     } finally {
